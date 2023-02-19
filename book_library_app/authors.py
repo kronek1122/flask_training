@@ -1,6 +1,11 @@
 from book_library_app import app
 from flask import jsonify
 
+@app.route('/')
+def home():
+    return "Hello, World!"
+
+    
 @app.route('/api/v1/authors',methods=['GET'])
 def get_authors():
     return jsonify({
