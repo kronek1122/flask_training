@@ -1,5 +1,6 @@
 from book_library_app import app
 from flask import jsonify
+from book_library_app.models import Author, AuthorSchema, author_schema
 
 @app.route('/')
 def home():
@@ -8,16 +9,20 @@ def home():
     
 @app.route('/api/v1/authors',methods=['GET'])
 def get_authors():
+    authors = Author.query.all()
+    author_schema = AuthorSchema(many=True)
     return jsonify({
         'success':True,
-        'data': 'Get all authors'
+        'data': author_schema.dump(authors),
+        'number_of_records': len(authors)
     })
 
 @app.route('/api/v1/authors/<int:author_id>',methods=['GET'])
 def get_author(author_id: int):
+    author = Author.query.get_or_404(author_id, description = f'Author with id {author_id} not found')
     return jsonify({
         'success':True,
-        'data': 'Get single authors with id {author_id}'
+        'data': author_schema.dump(author)
     })
 
 @app.route('/api/v1/authors',methods=['POST'])
