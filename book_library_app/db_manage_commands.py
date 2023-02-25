@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from datetime import datetime
+from sqlalchemy.sql import text
 
 from book_library_app import app, db
 from book_library_app.models import Author
@@ -14,11 +15,11 @@ def db_manage():
 def add_data():
     "Add sample data to database"
     try:
-        authors_path = Path(__file__).parents /'samples'/'authors.json' # Error do naprawy
+        authors_path = Path(__file__).parent /'samples'/'authors.json'
         with open(authors_path) as file:
             data_json = json.load(file)
         for item in data_json:
-            item['birth_date'] = datetime.strptime(item['birth_day'],'@d-@m-@Y').date()
+            item['birth_date'] = datetime.strptime(item['birth_date'],'%d-%m-%Y').date()
             author = Author(**item)
             db.session.add(author)
         db.session.commit()
@@ -31,7 +32,9 @@ def add_data():
 def remove_data():
     "Remove all data from the database"
     try:
-        db.session.execute('TRUNCATE TABLE authors')
+        db.session.execute(text('TRUNCATE TABLE authors'))
         db.session.commit()
+        print('Data has been succesfully remove')
+
     except Exception as exc:
         print('Unexpected error: {}'.format(exc))
